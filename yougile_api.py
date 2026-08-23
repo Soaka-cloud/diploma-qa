@@ -41,3 +41,13 @@ class YougileApi:
             json={"title": title},
             headers=self.headers,
         )
+
+    def get_boards(self) -> requests.Response:
+        return requests.get(f"{self.BASE_URL}/boards", headers=self.headers)
+
+    def create_column(self, title: str, board_id: str) -> requests.Response:
+        return requests.post(
+            f"{self.BASE_URL}/columns",
+            json={"title": title, "boardId": board_id},
+            headers=self.headers,
+        )

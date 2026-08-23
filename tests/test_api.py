@@ -34,8 +34,10 @@ class TestProjects:
             resp = api.get_projects()
         with allure.step("Проверить статус-код 200"):
             assert resp.status_code == 200
-        with allure.step("Проверить, что ответ — список"):
-            assert isinstance(resp.json(), list)
+        with allure.step("Проверить, что ответ содержит список проектов"):
+            body = resp.json()
+            assert "content" in body
+            assert isinstance(body["content"], list)
 
     @allure.title("Создание проекта")
     @allure.severity(allure.severity_level.CRITICAL)

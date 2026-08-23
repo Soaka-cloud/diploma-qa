@@ -5,10 +5,10 @@ from pages.base_page import BasePage
 
 
 class LoginPage(BasePage):
-    LOGIN_BUTTON = (By.XPATH, "//*[contains(text(), 'Войти')]")
-    EMAIL_INPUT = (By.XPATH, "//input[@placeholder='E-mail']")
-    PASSWORD_INPUT = (By.XPATH, "//input[@placeholder='Пароль']")
-    SUBMIT_BUTTON = (By.XPATH, "//button[contains(., 'Войти')]")
+    LOGIN_BUTTON = (By.XPATH, "//a[contains(text(), 'Войти')]")
+    EMAIL_INPUT = (By.XPATH, "//input[@type='email']")
+    PASSWORD_INPUT = (By.XPATH, "//input[@type='password']")
+    SUBMIT_BUTTON = (By.XPATH, "//div[contains(text(), 'Войти')]")
     DASHBOARD_TITLE = (By.XPATH, "//*[contains(text(), 'Проекты')]")
 
     def open(self) -> None:

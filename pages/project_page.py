@@ -1,18 +1,31 @@
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 
 from pages.base_page import BasePage
 
 
 class ProjectPage(BasePage):
-    TITLE_LABEL = (By.XPATH, "//*[contains(@class, 'title')]")
-    NAME_INPUT = (By.XPATH, "//input[@placeholder='Название']")
-    SAVE_BUTTON = (By.XPATH, "//button[contains(., 'Сохранить')]")
+    RENAME_ITEM = (By.XPATH, "//*[contains(text(), 'Переименовать')]")
+    NAME_INPUT = (
+        By.XPATH, "//input[@placeholder='Введите название проекта…']",
+    )
 
-    def rename(self, new_title: str) -> None:
-        self.click(*self.TITLE_LABEL)
-        self.type_text(*self.NAME_INPUT, new_title)
-        self.click(*self.SAVE_BUTTON)
+    def rename(self, name: str, new_title: str) -> None:
+        menu_button = (
+            By.XPATH,
+            f"//*[@data-testid='project-card'][contains(., '{name}')]"
+            f"//*[@data-testid='project-card-menu-button']",
+        )
+        self.click(*menu_button)
+        self.click(*self.RENAME_ITEM)
+        field = self.find(*self.NAME_INPUT)
+        field.send_keys(Keys.CONTROL, "a")
+        field.send_keys(new_title)
+        self.press_enter(*self.NAME_INPUT)
 
     def is_title_visible(self, title: str) -> bool:
-        locator = (By.XPATH, f"//*[contains(text(), '{title}')]")
+        locator = (
+            By.XPATH,
+            f"//*[@data-testid='project-card'][contains(., '{title}')]",
+        )
         return self.is_visible(*locator)
