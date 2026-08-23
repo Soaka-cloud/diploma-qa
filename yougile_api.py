@@ -42,6 +42,13 @@ class YougileApi:
             headers=self.headers,
         )
 
+    def delete_project(self, project_id: str) -> requests.Response:
+        return requests.put(
+            f"{self.BASE_URL}/projects/{project_id}",
+            json={"deleted": True},
+            headers=self.headers,
+        )
+
     def get_boards(self) -> requests.Response:
         return requests.get(f"{self.BASE_URL}/boards", headers=self.headers)
 
