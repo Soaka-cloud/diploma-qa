@@ -1,3 +1,4 @@
+import random
 import uuid
 
 import allure
@@ -12,7 +13,7 @@ from pages.project_page import ProjectPage
 
 
 def _unique_name() -> str:
-    return f"Тест {uuid.uuid4().hex[:8]}"
+    return f"Тест-проект {random.randint(10000, 99999)}"
 
 
 @allure.feature("UI. Авторизация")

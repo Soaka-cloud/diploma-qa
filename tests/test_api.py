@@ -1,3 +1,4 @@
+import random
 import uuid
 
 import allure
@@ -9,7 +10,11 @@ from yougile_api import YougileApi
 
 
 def _unique_name() -> str:
-    return f"Проект {uuid.uuid4()}"
+    return f"Проект {random.randint(10000, 99999)}"
+
+
+def _new_name() -> str:
+    return f"Новый {random.randint(10000, 99999)}"
 
 
 @allure.feature("API. Авторизация")
@@ -66,7 +71,7 @@ class TestProjects:
     @allure.severity(allure.severity_level.NORMAL)
     def test_update_project(self, api: YougileApi) -> None:
         project_id = api.create_project(_unique_name()).json()["id"]
-        new_title = f"Новый {uuid.uuid4()}"
+        new_title = _new_name()
         with allure.step("Выполнить PUT /projects/{id}"):
             resp = api.update_project(project_id, new_title)
         with allure.step("Проверить статус-код 200 и новое название"):
