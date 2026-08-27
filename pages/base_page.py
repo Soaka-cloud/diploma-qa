@@ -1,3 +1,5 @@
+import time
+
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webdriver import WebDriver
@@ -16,6 +18,51 @@ class BasePage:
 
     def click(self, by: str, locator: str) -> None:
         self.wait.until(EC.element_to_be_clickable((by, locator))).click()
+
+    def click_js(self, by: str, locator: str) -> None:
+        self.find(by, locator)
+        self.driver.execute_script(
+            "arguments[0].click();",
+            self.driver.find_element(by, locator),
+        )
+
+    def wait_for_presence(self, by: str, locator: str,
+                          timeout: int = 60, poll: float = 2.0) -> bool:
+        deadline = time.monotonic() + timeout
+        while time.monotonic() < deadline:
+            if self.driver.find_elements(by, locator):
+                return True
+            time.sleep(poll)
+        return False
+
+    def find_in_scrollable_list(self, locator: tuple,
+                                timeout: int = 90) -> bool:
+        """Ищет элемент в виртуализированном списке, прокручивая его."""
+        deadline = time.monotonic() + timeout
+        while time.monotonic() < deadline:
+            if self.driver.find_elements(*locator):
+                return True
+            self.driver.execute_script(
+                "var list = document.querySelector("
+                "'[data-testid=\"projects-list\"]');"
+                "if (list) { list.scrollTop += 700; }"
+                "else { window.scrollBy(0, 700); }"
+            )
+            time.sleep(1.2)
+            at_bottom = self.driver.execute_script(
+                "var list = document.querySelector("
+                "'[data-testid=\"projects-list\"]');"
+                "if (list) {"
+                "  return list.scrollTop + list.clientHeight"
+                "         >= list.scrollHeight;"
+                "}"
+                "return window.innerHeight + window.scrollY"
+                "       >= document.body.scrollHeight;"
+            )
+            if at_bottom:
+                self.driver.refresh()
+                time.sleep(3)
+        return False
 
     def type_text(self, by: str, locator: str, text: str) -> None:
         self.find(by, locator).send_keys(text)

@@ -10,6 +10,7 @@ from pages.board_page import BoardPage
 from pages.dashboard_page import DashboardPage
 from pages.login_page import LoginPage
 from pages.project_page import ProjectPage
+from yougile_api import YougileApi
 
 
 def _unique_name() -> str:
@@ -39,11 +40,12 @@ class TestProjects:
 
     @allure.title("Редактирование названия проекта")
     @allure.severity(allure.severity_level.NORMAL)
-    def test_rename_project(self, logged_in_driver: WebDriver) -> None:
+    def test_rename_project(self, logged_in_driver: WebDriver,
+                            api: YougileApi) -> None:
         name = _unique_name()
         new_name = f"{name} (изм.)"
-        dashboard = DashboardPage(logged_in_driver)
-        dashboard.create_project(name)
+        with allure.step("Создать проект через API (подготовка данных)"):
+            api.create_project(name)
         logged_in_driver.get(UI_URL + "/team/")
         project = ProjectPage(logged_in_driver)
         card = (
@@ -51,10 +53,7 @@ class TestProjects:
             f"//*[@data-testid='project-card'][contains(., '{name}')]",
         )
         with allure.step("Дождаться карточки проекта"):
-            for _ in range(3):
-                if project.is_visible_short(*card, timeout=10):
-                    break
-                logged_in_driver.refresh()
+            assert project.find_in_scrollable_list(card, timeout=90)
         with allure.step("Переименовать проект"):
             project.rename(name, new_name)
         with allure.step("Проверить новое название"):
