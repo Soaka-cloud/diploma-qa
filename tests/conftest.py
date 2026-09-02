@@ -1,6 +1,4 @@
 import re
-import time
-
 import pytest
 from selenium import webdriver
 from selenium.webdriver.remote.webdriver import WebDriver
@@ -39,7 +37,6 @@ def _delete_test_projects() -> None:
             return
         for project in junk:
             api.delete_project(project["id"])
-        time.sleep(5)
 
 
 @pytest.fixture(scope="session", autouse=True)

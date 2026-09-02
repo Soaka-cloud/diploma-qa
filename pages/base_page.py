@@ -1,6 +1,7 @@
 import time
 
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
@@ -35,33 +36,34 @@ class BasePage:
             time.sleep(poll)
         return False
 
+    SHOW_MORE = (
+        By.XPATH,
+        "//*[contains(translate(text(), "
+        "'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', "
+        "'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'), "
+        "'показать ещё')]",
+    )
+
     def find_in_scrollable_list(self, locator: tuple,
                                 timeout: int = 90) -> bool:
-        """Ищет элемент в виртуализированном списке, прокручивая его."""
+        """Ищет элемент в списке проектов, догружая его кнопкой
+        «Показать больше» (Yougile грузит карточки постранично)."""
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
             if self.driver.find_elements(*locator):
                 return True
-            self.driver.execute_script(
-                "var list = document.querySelector("
-                "'[data-testid=\"projects-list\"]');"
-                "if (list) { list.scrollTop += 700; }"
-                "else { window.scrollBy(0, 700); }"
-            )
-            time.sleep(1.2)
-            at_bottom = self.driver.execute_script(
-                "var list = document.querySelector("
-                "'[data-testid=\"projects-list\"]');"
-                "if (list) {"
-                "  return list.scrollTop + list.clientHeight"
-                "         >= list.scrollHeight;"
-                "}"
-                "return window.innerHeight + window.scrollY"
-                "       >= document.body.scrollHeight;"
-            )
-            if at_bottom:
-                self.driver.refresh()
-                time.sleep(3)
+            # кнопка «Показать больше» подгружает следующую страницу
+            if self.driver.find_elements(*self.SHOW_MORE):
+                self.click_js(*self.SHOW_MORE)
+            else:
+                # запасной вариант: прокрутка контейнера
+                self.driver.execute_script(
+                    "var list = document.querySelector("
+                    "'[data-testid=\"panel-company-projects\"]');"
+                    "if (list) { list.scrollTop += 700; }"
+                    "else { window.scrollBy(0, 700); }"
+                )
+            time.sleep(1.5)
         return False
 
     def type_text(self, by: str, locator: str, text: str) -> None:
