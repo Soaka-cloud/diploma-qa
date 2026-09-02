@@ -685,7 +685,7 @@
                 "{{base_url}}"
               ],
               "path": [
-                "columns?boardId={{boardId}}"
+                "columns"
               ],
               "query": [
                 {
@@ -898,7 +898,7 @@
                 "{{base_url}}"
               ],
               "path": [
-                "columns?boardId={{boardId}}"
+                "columns"
               ],
               "query": [
                 {
